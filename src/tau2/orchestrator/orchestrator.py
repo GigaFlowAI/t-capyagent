@@ -135,6 +135,7 @@ class BaseOrchestrator(ABC, Generic[BaseAgentT, BaseUserT, TrajectoryItemT]):
         self.done: bool = False
         self.termination_reason: Optional[TerminationReason] = None
         self.num_errors: int = 0
+        self.num_tool_calls: int = 0
         self._run_start_time: Optional[str] = None
         self._run_start_perf: Optional[float] = None
 
@@ -322,6 +323,7 @@ class BaseOrchestrator(ABC, Generic[BaseAgentT, BaseUserT, TrajectoryItemT]):
         """
         tool_results = []
         for tool_call in tool_calls:
+            self.num_tool_calls += 1
             tool_result = self.environment.get_response(tool_call)
             if tool_result.error:
                 self.num_errors += 1
