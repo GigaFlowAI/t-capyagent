@@ -110,7 +110,7 @@ def run_simulation(
 
         span = trace.get_current_span()
         span.set_attribute("tau2.simulation.id", simulation.id)
-        span.set_attribute("tau2.task.id", simulation.task_id)
+        span.set_attribute("tau2.task_id", simulation.task_id)
         span.set_attribute("tau2.reward", reward_info.reward)
         span.set_attribute("tau2.duration_seconds", simulation.duration)
         span.set_attribute(
