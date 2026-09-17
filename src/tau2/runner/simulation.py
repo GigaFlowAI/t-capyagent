@@ -27,10 +27,21 @@ def _configure_gigaflow() -> None:
     global _gigaflow_configured
     if _gigaflow_configured:
         return
+    # Tracing must never break a benchmark run. Both variables are unset unless someone has
+    # created a GigaFlow ingest token and exported them; without them the SDK is configured
+    # disabled, every primitive is a no-op, and the simulation runs exactly as before.
+    endpoint = os.environ.get("GIGAFLOW_OTLP_ENDPOINT")
+    api_key = os.environ.get("GIGAFLOW_OTLP_TOKEN")
+    if not (endpoint and api_key):
+        logger.warning(
+            "GIGAFLOW_OTLP_ENDPOINT / GIGAFLOW_OTLP_TOKEN are not set: no traces will be sent "
+            "to GigaFlow. Create an ingest token on the Trace node in GigaFlow to enable them."
+        )
     configure(
         service_name="tau2",
-        endpoint=os.environ["GIGAFLOW_OTLP_ENDPOINT"],
-        api_key=os.environ["GIGAFLOW_OTLP_TOKEN"],
+        endpoint=endpoint,
+        api_key=api_key,
+        disabled=not (endpoint and api_key),
     )
     atexit.register(shutdown)
     _gigaflow_configured = True
