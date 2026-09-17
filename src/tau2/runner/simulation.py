@@ -5,35 +5,16 @@ Runs a pre-built orchestrator and evaluates the result.
 No registry dependency, no config parsing, no side effects.
 """
 
-import atexit
-import os
 from typing import Optional, Union
 
-from gigaflow import agent, configure, shutdown
 from loguru import logger
-from opentelemetry import trace
 
 from tau2.data_model.simulation import SimulationRun
 from tau2.evaluator.evaluator import EvaluationType, evaluate_simulation
 from tau2.orchestrator.full_duplex_orchestrator import FullDuplexOrchestrator
 from tau2.orchestrator.modes import CommunicationMode
 from tau2.orchestrator.orchestrator import Orchestrator
-
-_gigaflow_configured = False
-
-
-def _configure_gigaflow() -> None:
-    """Configure GigaFlow once and flush its spans at process exit."""
-    global _gigaflow_configured
-    if _gigaflow_configured:
-        return
-    configure(
-        service_name="tau2",
-        endpoint=os.environ["GIGAFLOW_OTLP_ENDPOINT"],
-        api_key=os.environ["GIGAFLOW_OTLP_TOKEN"],
-    )
-    atexit.register(shutdown)
-    _gigaflow_configured = True
+from tau2.utils.tracing import flush_tracing, traced_span
 
 
 def run_simulation(
@@ -75,10 +56,18 @@ def run_simulation(
         result = run_simulation(orchestrator)
         print(result.reward_info.reward)
     """
-    _configure_gigaflow()
-    with agent(
-        name="tau2.simulation", conversation_id=orchestrator.simulation_id
-    ):
+    with traced_span(
+        "tau2.simulation",
+        type="task",
+        input={
+            "task_id": orchestrator.task.id,
+            "user_scenario": orchestrator.task.user_scenario.model_dump(mode="json"),
+        },
+        metadata={
+            "domain": orchestrator.environment.get_domain_name(),
+            "simulation_id": orchestrator.simulation_id,
+        },
+    ) as span:
         # Run the orchestrator
         simulation = orchestrator.run()
 
@@ -108,20 +97,26 @@ def run_simulation(
         )
         simulation.reward_info = reward_info
 
-        span = trace.get_current_span()
-        span.set_attribute("tau2.simulation.id", simulation.id)
-        span.set_attribute("tau2.task.id", simulation.task_id)
-        span.set_attribute("tau2.reward", reward_info.reward)
-        span.set_attribute("tau2.duration_seconds", simulation.duration)
-        span.set_attribute(
-            "tau2.termination_reason", simulation.termination_reason.value
+        span.log(
+            output={
+                "messages": [m.model_dump(mode="json") for m in simulation.messages],
+                "termination_reason": simulation.termination_reason.value,
+            },
+            scores={"reward": reward_info.reward},
+            metadata={
+                "simulation_id": simulation.id,
+                "task_id": simulation.task_id,
+                "reward_info": reward_info.model_dump(mode="json"),
+                "tool_call_count": orchestrator.num_tool_calls,
+                "tool_error_count": orchestrator.num_errors,
+            },
+            metrics={"duration_seconds": simulation.duration},
         )
-        span.set_attribute("tau2.tool_call_count", orchestrator.num_tool_calls)
-        span.set_attribute("tau2.tool_error_count", orchestrator.num_errors)
 
         logger.info(
             f"Simulation complete: domain={domain}, task={task.id}, "
             f"reward={reward_info.reward}"
         )
 
+    flush_tracing()
     return simulation

@@ -17,6 +17,7 @@ from tau2.data_model.tasks import EnvAssertion, EnvFunctionCall, InitializationD
 from tau2.environment.db import DB
 from tau2.environment.tool import Tool
 from tau2.environment.toolkit import ToolKitBase, ToolSignature, get_tool_signatures
+from tau2.utils.tracing import traced_span
 
 
 class EnvironmentInfo(BaseModel):
@@ -471,16 +472,23 @@ class Environment:
             The response of the tool call.
         """
         error = False
-        try:
-            resp = self.make_tool_call(
-                message.name, requestor=message.requestor, **message.arguments
-            )
-            self.sync_tools()
-        except Exception as e:
-            resp = f"Error: {e}"
-            error = True
-        logger.debug(f"Response: {resp}")
-        resp = self.to_json_str(resp)
+        with traced_span(
+            message.name,
+            type="tool",
+            input=message.arguments,
+            metadata={"tool_call_id": message.id, "requestor": message.requestor},
+        ) as span:
+            try:
+                resp = self.make_tool_call(
+                    message.name, requestor=message.requestor, **message.arguments
+                )
+                self.sync_tools()
+            except Exception as e:
+                resp = f"Error: {e}"
+                error = True
+            logger.debug(f"Response: {resp}")
+            resp = self.to_json_str(resp)
+            span.log(output=resp, metadata={"error": error})
         return ToolMessage(
             id=message.id,
             content=resp,
