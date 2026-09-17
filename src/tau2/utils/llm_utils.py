@@ -39,6 +39,11 @@ from tau2.data_model.message import (
     UserMessage,
 )
 from tau2.environment.tool import Tool
+from tau2.utils.tracing import configure_tracing
+
+# Braintrust patches `litellm.completion`; rebind the name imported above to the traced one.
+if configure_tracing():
+    completion = litellm.completion
 
 # Suppress Pydantic serialization warnings from LiteLLM
 # These occur due to type mismatches between streaming and non-streaming response types
