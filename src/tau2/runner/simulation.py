@@ -9,6 +9,7 @@ import atexit
 import os
 from typing import Optional, Union
 
+from braintrust import current_span
 from gigaflow import agent, configure, shutdown
 from loguru import logger
 from opentelemetry import trace
@@ -118,6 +119,9 @@ def run_simulation(
         )
         span.set_attribute("tau2.tool_call_count", orchestrator.num_tool_calls)
         span.set_attribute("tau2.tool_error_count", orchestrator.num_errors)
+        current_span().log(
+            metadata={"tau2.user_persona": task.user_scenario.persona}
+        )
 
         logger.info(
             f"Simulation complete: domain={domain}, task={task.id}, "
