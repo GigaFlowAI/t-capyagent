@@ -148,16 +148,15 @@ wheels = [
 
 [[package]]
 name = "anyio"
-version = "4.11.0"
+version = "4.14.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "idna" },
-    { name = "sniffio" },
     { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c6/78/7d432127c41b50bccba979505f272c16cbcadcc33645d5fa3a738110ae75/anyio-4.11.0.tar.gz", hash = "sha256:82a8d0b81e318cc5ce71a5f1f8b5c4e63619620b63141ef8c995fa0db95a57c4", size = 219094, upload-time = "2025-09-23T09:19:12.58Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/61/cc/a381afa6efea9f496eff839d4a6a1aed3bfafc7b3ab4b0d1b243a12573dd/anyio-4.14.2.tar.gz", hash = "sha256:cfa139f3ed1a23ee8f88a145ddb5ac7605b8bbfd8592baacd7ce3d8bb4313c7f", size = 260176, upload-time = "2026-07-12T20:29:07.082Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/15/b3/9b1a8074496371342ec1e796a96f99c82c945a339cd81a8e73de28b4cf9e/anyio-4.11.0-py3-none-any.whl", hash = "sha256:0287e96f4d26d4149305414d4e3bc32f0dcd0862365a4bddea19d7a1ec38c4fc", size = 109097, upload-time = "2025-09-23T09:19:10.601Z" },
+    { url = "https://files.pythonhosted.org/packages/da/35/f2287558c17e29fafc8ef3daf819bb9834061cfa43bff8014f7df7f63bdc/anyio-4.14.2-py3-none-any.whl", hash = "sha256:9f505dda5ac9f0c8309b5e8bd445a8c2bf7246f3ce950121e45ea15bc41d1494", size = 125813, upload-time = "2026-07-12T20:29:05.763Z" },
 ]
 
 [[package]]
@@ -723,6 +722,20 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/24/7f/2747c0d332b9acfa75dc84447a066fdf812b5a6b8d30472b74d309bfe8cb/fsspec-2025.10.0.tar.gz", hash = "sha256:b6789427626f068f9a83ca4e8a3cc050850b6c0f71f99ddb4f542b8266a26a59", size = 309285, upload-time = "2025-10-30T14:58:44.036Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/eb/02/a6b21098b1d5d6249b7c5ab69dde30108a71e4e819d4a9778f1de1d5b70d/fsspec-2025.10.0-py3-none-any.whl", hash = "sha256:7c7712353ae7d875407f97715f0e1ffcc21e33d5b24556cb1e090ae9409ec61d", size = 200966, upload-time = "2025-10-30T14:58:42.53Z" },
+]
+
+[[package]]
+name = "gigaflow"
+version = "0.6.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "opentelemetry-exporter-otlp-proto-http" },
+    { name = "opentelemetry-sdk" },
+    { name = "pyyaml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/69/2b/247e973ecc077141ca06d98609b6418f2ac1151a06c78065938e973ff836/gigaflow-0.6.4.tar.gz", hash = "sha256:6f3c09d8d0299cf497dde87989edd448ff114841cded022e987ce1c611a2dfd0", size = 40559, upload-time = "2026-09-13T01:01:48.246Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6d/6b/7b19d78fc5f2d8e4f6c0c2ed4e7cb67d177310e5a74b162c3ffb8eba93f7/gigaflow-0.6.4-py3-none-any.whl", hash = "sha256:bf632934ba8c77de10dd20e9a7df51367b6aa9ed53b57e912a6bff13258feabf", size = 49970, upload-time = "2026-09-13T01:01:47.126Z" },
 ]
 
 [[package]]
@@ -2895,6 +2908,7 @@ dependencies = [
     { name = "deepdiff" },
     { name = "docstring-parser" },
     { name = "fastapi" },
+    { name = "gigaflow" },
     { name = "httpx" },
     { name = "litellm" },
     { name = "loguru" },
@@ -3017,6 +3031,7 @@ requires-dist = [
     { name = "docstring-parser", specifier = ">=0.16" },
     { name = "elevenlabs", marker = "extra == 'voice'", specifier = ">=1.54.0" },
     { name = "fastapi", specifier = ">=0.115.11" },
+    { name = "gigaflow" },
     { name = "google-auth", marker = "extra == 'voice'", specifier = ">=2.23.0" },
     { name = "google-cloud-aiplatform", marker = "extra == 'voice'", specifier = ">=1.38.0" },
     { name = "google-genai", marker = "extra == 'voice'", specifier = ">=1.0.0" },
